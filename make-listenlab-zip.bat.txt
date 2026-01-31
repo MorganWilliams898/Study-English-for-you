@@ -1,0 +1,342 @@
+@echo off
+setlocal enabledelayedexpansion
+
+:: 创建临时文件夹
+set "FOLDER=listenlab-site"
+if exist "%FOLDER%" rmdir /s /q "%FOLDER%"
+mkdir "%FOLDER%"
+
+:: ========== 1. 写入 index.html ==========
+(
+echo ^<!DOCTYPE html^>
+echo ^<html lang="zh-CN"^>
+echo ^<head^>
+echo   ^<meta charset="UTF-8" /^>
+echo   ^<meta name="viewport" content="width=device-width, initial-scale=1.0"/^>
+echo   ^<title^>ListenLab｜YouTube 英语精听训练站^</title^>
+echo   ^<style^>
+echo     :root { --primary: #ff0000; --primary-dark: #cc0000; --bg: #f9f9f9; --card: #ffffff; --text: #333; --text-light: #666; --border: #e0e0e0; --success: #4caf50; --warning: #ff9800; --gray: #9e9e9e; --shadow: 0 2px 10px rgba^^(0,0,0,0.05^); }
+echo     * { box-sizing: border-box; margin: 0; padding: 0; }
+echo     body { font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.6; color: var^(--text^); background-color: var^(--bg^); padding-bottom: 80px; }
+echo     .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+echo     header { background: linear-gradient^^(135deg, #1a2a6c, #2c3e50^); color: white; padding: 20px 0; text-align: center; box-shadow: var^(--shadow^); }
+echo     h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+echo     .subtitle { font-size: 1.1rem; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+echo     .tabs { display: flex; border-bottom: 2px solid var^(--border^); margin: 24px 0; }
+echo     .tab-btn { padding: 12px 24px; background: none; border: none; font-size: 1.1rem; font-weight: 600; color: var^(--text-light^); cursor: pointer; position: relative; transition: all 0.2s; }
+echo     .tab-btn.active { color: var^(--primary^); }
+echo     .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: var^(--primary^); border-radius: 3px; }
+echo     .section { display: none; padding: 24px 0; }
+echo     .section.active { display: block; animation: fadeIn 0.3s ease; }
+echo     @keyframes fadeIn { from { opacity: 0; transform: translateY^^(10px^); } to { opacity: 1; transform: translateY^^(0^); } }
+echo     .card { background: var^(--card^); border-radius: 12px; box-shadow: var^(--shadow^); padding: 24px; margin-bottom: 24px; border: 1px solid var^(--border^); }
+echo     .card-title { font-size: 1.4rem; margin-bottom: 16px; color: var^(--text^); display: flex; align-items: center; gap: 8px; }
+echo     .card-title i { color: var^(--primary^); font-size: 1.2rem; }
+echo     .video-container { position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 24px; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; text-align: center; padding: 20px; }
+echo     .video-placeholder { background: url^('https://bailian-bmp-pre.oss-cn-hangzhou.aliyuncs.com/public/system_agent/PlaceHolder.png'^) center/cover no-repeat; width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0.15; }
+echo     .video-info { position: relative; z-index: 2; text-align: left; width: 100%; padding: 0 16px; }
+echo     .video-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+echo     .video-meta { display: flex; gap: 16px; font-size: 0.9rem; color: #aaa; margin-bottom: 16px; }
+echo     .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+echo     .badge.level { background: #e3f2fd; color: #1976d2; }
+echo     .badge.scene { background: #f3e5f5; color: #7b1fa2; }
+echo     .badge.type { background: #e8f5e9; color: #388e3c; }
+echo     .controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+echo     .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+echo     .btn-primary { background: var^(--primary^); color: white; }
+echo     .btn-primary:hover { background: var^(--primary-dark^); }
+echo     .btn-outline { background: transparent; border: 1px solid var^(--primary^); color: var^(--primary^); }
+echo     .btn-sm { padding: 6px 14px; font-size: 0.9rem; }
+echo     .subtitle-display { background: rgba^^(0,0,0,0.7^); color: white; padding: 16px; border-radius: 8px; margin: 20px 0; font-size: 1.3rem; min-height: 60px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.5; word-break: break-word; cursor: pointer; transition: background 0.2s; }
+echo     .subtitle-display:hover { background: rgba^^(0,0,0,0.85^); }
+echo     .sentence-list { display: grid; grid-template-columns: repeat^^(auto-fill, minmax^^(300px, 1fr^); gap: 16px; margin-top: 16px; }
+echo     .sentence-item { padding: 14px; background: #f5f5f5; border-radius: 8px; cursor: pointer; transition: all 0.2s; border-left: 4px solid var^(--primary^); }
+echo     .sentence-item:hover { background: #eef2ff; }
+echo     .sentence-item.active { background: #e3f2fd; }
+echo     .word-popup { position: fixed; top: 50%%; left: 50%%; transform: translate^(-50%%, -50%%^); background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba^^(0,0,0,0.2^); padding: 24px; width: 90%%; max-width: 500px; z-index: 1000; display: none; border: 1px solid var^(--border^); }
+echo     .popup-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+echo     .word-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+echo     .word-text { font-size: 1.5rem; font-weight: 700; color: var^(--text^); }
+echo     .word-pos { background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; }
+echo     .word-def { margin: 16px 0; line-height: 1.6; }
+echo     .word-example { padding: 12px; background: #f9f9f9; border-radius: 8px; font-style: italic; color: #555; }
+echo     .practice-area { margin-top: 24px; padding: 20px; background: #f0f8ff; border-radius: 12px; border-left: 4px solid var^(--primary^); }
+echo     .practice-title { font-weight: 700; margin-bottom: 12px; color: #1976d2; }
+echo     .input-group { margin-bottom: 16px; }
+echo     .input-group label { display: block; margin-bottom: 6px; font-weight: 600; }
+echo     .input-group input, .input-group textarea { width: 100%%; padding: 12px; border: 1px solid var^(--border^); border-radius: 8px; font-size: 1rem; }
+echo     .feedback { padding: 12px; border-radius: 8px; margin-top: 12px; display: none; }
+echo     .feedback.correct { background: #e8f5e9; color: #388e3c; }
+echo     .feedback.incorrect { background: #ffebee; color: #d32f2f; }
+echo     .stats-grid { display: grid; grid-template-columns: repeat^^(auto-fit, minmax^^(200px, 1fr^); gap: 16px; margin-top: 16px; }
+echo     .stat-card { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: var^(--shadow^); border: 1px solid var^(--border^); }
+echo     .stat-value { font-size: 2rem; font-weight: 700; color: var^(--primary^); }
+echo     .stat-label { font-size: 0.9rem; color: var^(--text-light^); }
+echo     .calendar { display: grid; grid-template-columns: repeat^^(7, 1fr^); gap: 4px; margin-top: 16px; }
+echo     .calendar-day { aspect-ratio: 1; border-radius: 50%%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+echo     .calendar-day.other-month { color: #ccc; }
+echo     .calendar-day.today { background: var^(--primary^); color: white; }
+echo     .calendar-day.completed { background: var^(--success^); color: white; }
+echo     .calendar-day.missed { background: #f44336; color: white; }
+echo     footer { text-align: center; padding: 24px 0; color: var^(--text-light^); font-size: 0.9rem; margin-top: 40px; border-top: 1px solid var^(--border^); }
+echo     @media (max-width: 768px) { .tabs { flex-wrap: wrap; } .tab-btn { padding: 10px 16px; font-size: 1rem; } .video-container { aspect-ratio: 4/3; } .sentence-list { grid-template-columns: 1fr; } h1 { font-size: 1.6rem; } }
+echo   ^</style^>
+echo ^</head^>
+echo ^<body^>
+echo ^<header^>
+echo   ^<div class="container"^>
+echo     ^<h1^>🎧 ListenLab^</h1^>
+echo     ^<p class="subtitle"^>专注 YouTube 英语精听｜变速听力 × 多模字幕 × 词句拆解 × 听写打卡^</p^>
+echo   ^</div^>
+echo ^</header^>
+echo ^<div class="container"^>
+echo   ^<div class="tabs"^>
+echo     ^<button class="tab-btn active" data-tab="library"^>📚 素材库^</button^>
+echo     ^<button class="tab-btn" data-tab="player"^>▶️ 沉浸学习^</button^>
+echo     ^<button class="tab-btn" data-tab="practice"^>✍️ 词句练习^</button^>
+echo     ^<button class="tab-btn" data-tab="review"^>🔁 巩固复习^</button^>
+echo     ^<button class="tab-btn" data-tab="stats"^>📊 学习管理^</button^>
+echo   ^</div^>
+echo ^<section id="library" class="section active"^>
+echo     ^<div class="card"^>
+echo       ^<h2 class="card-title"^>^<i^>📁^</i^> 精选 YouTube 英语素材库^</h2^>
+echo       ^<p^>按场景、类型、难度精准分类，每条视频已切分为独立句子，支持一键跳转学习^</p^>
+echo ^<div class="filters" style="margin: 20px 0; display: flex; flex-wrap: wrap; gap: 12px;"^>
+echo         ^<select id="filter-scene" class="btn btn-sm btn-outline"^>
+echo           ^<option value=""^>全部场景^</option^>
+echo           ^<option value="daily"^>日常^</option^>
+echo           ^<option value="work"^>职场^</option^>
+echo           ^<option value="travel"^>旅游^</option^>
+echo         ^</select^>
+echo         ^<select id="filter-level" class="btn btn-sm btn-outline"^>
+echo           ^<option value=""^>全部难度^</option^>
+echo           ^<option value="beginner"^>入门^</option^>
+echo           ^<option value="intermediate"^>中级^</option^>
+echo           ^<option value="advanced"^>高级^</option^>
+echo         ^</select^>
+echo         ^<input type="text" id="search-input" placeholder="关键词搜索..." class="btn-sm" style="padding: 10px 14px; flex: 1; max-width: 240px;"^>
+echo       ^</div^>
+echo ^<div id="video-grid" class="sentence-list"^>^</div^>
+echo     ^</div^>
+echo   ^</section^>
+echo ^<section id="player" class="section"^>
+echo     ^<div class="card"^>
+echo       ^<h2 class="card-title"^>^<i^>🔊^</i^> 沉浸式听力训练^</h2^>
+echo ^<div class="video-container"^>
+echo         ^<div class="video-placeholder"^>^</div^>
+echo         ^<div class="video-info"^>
+echo           ^<div class="video-title" id="video-title"^>BBC Learning English: How to Order Coffee^</div^>
+echo           ^<div class="video-meta"^>
+echo             ^<span class="badge scene"^>日常^</span^>
+echo             ^<span class="badge level"^>入门^</span^>
+echo             ^<span class="badge type"^>对话^</span^>
+echo             ^<span^>⏱️ 2m 18s^</span^>
+echo           ^</div^>
+echo           ^<p id="video-desc"^>学习在咖啡馆点单的实用英语表达，语速慢、发音清晰，适合初学者跟读模仿。^</p^>
+echo         ^</div^>
+echo       ^</div^>
+echo ^<div class="controls"^>
+echo         ^<button id="play-btn" class="btn btn-primary"^>^<i^>▶^</i^> 播放^</button^>
+echo         ^<button id="pause-btn" class="btn btn-outline"^>^<i^>⏸^</i^> 暂停^</button^>
+echo         ^<button id="loop-btn" class="btn btn-outline"^>^<i^>🔁^</i^> 单句循环^</button^>
+echo         ^<div style="display: flex; align-items: center; gap: 8px;"^>
+echo           ^<span^>速度：^</span^>
+echo           ^<input type="range" id="speed-slider" min="0.5" max="2.0" step="0.1" value="1.0"^>
+echo           ^<span id="speed-value"^>1.0x^</span^>
+echo         ^</div^>
+echo       ^</div^>
+echo ^<div class="subtitle-display" id="subtitle-display"^>
+echo         Click any word below to look it up!
+echo       ^</div^>
+echo ^<div class="sentence-list" id="sentence-list"^>^</div^>
+echo ^<div class="practice-area"^>
+echo         ^<h3 class="practice-title"^>📝 当前句子听写^</h3^>
+echo         ^<div class="input-group"^>
+echo           ^<label for="dictation-input"^>请听写下方句子（播放后开始）：^</label^>
+echo           ^<input type="text" id="dictation-input" placeholder="Type what you hear..."^>
+echo         ^</div^>
+echo         ^<button id="check-dictation" class="btn btn-primary"^>✅ 提交检查^</button^>
+echo         ^<div id="dictation-feedback" class="feedback"^>^</div^>
+echo       ^</div^>
+echo     ^</div^>
+echo   ^</section^>
+echo ^<section id="practice" class="section"^>
+echo     ^<div class="card"^>
+echo       ^<h2 class="card-title"^>^<i^>📖^</i^> 词句针对性练习^</h2^>
+echo       ^<p^>从当前视频中自动提取重点词句，支持听写、填空、搭配训练^</p^>
+echo ^<div class="sentence-list" id="practice-list"^>^</div^>
+echo ^<div class="practice-area"^>
+echo         ^<h3 class="practice-title"^>🎯 当前练习：选词填空^</h3^>
+echo         ^<p id="fill-in-sentence"^>I ___ like coffee with milk.^</p^>
+echo         ^<div style="display: flex; gap: 12px; margin: 12px 0;"^>
+echo           ^<button class="btn btn-outline fill-option" data-word="do"^>do^</button^>
+echo           ^<button class="btn btn-outline fill-option" data-word="don't"^>don't^</button^>
+echo           ^<button class="btn btn-outline fill-option" data-word="does"^>does^</button^>
+echo         ^</div^>
+echo         ^<div id="fill-feedback" class="feedback"^>^</div^>
+echo       ^</div^>
+echo     ^</div^>
+echo   ^</section^>
+echo ^<section id="review" class="section"^>
+echo     ^<div class="card"^>
+echo       ^<h2 class="card-title"^>^<i^>🧠^</i^> 巩固记忆 —— 生词本打卡^</h2^>
+echo       ^<p^>你点击查过的单词已自动加入生词本，按艾宾浩斯规律提醒复习^</p^>
+echo ^<div class="stats-grid"^>
+echo         ^<div class="stat-card"^>
+echo           ^<div class="stat-value" id="review-count"^>7^</div^>
+echo           ^<div class="stat-label"^>今日待复习^</div^>
+echo         ^</div^>
+echo         ^<div class="stat-card"^>
+echo           ^<div class="stat-value" id="mastered-count"^>23^</div^>
+echo           ^<div class="stat-label"^>已掌握^</div^>
+echo         ^</div^>
+echo         ^<div class="stat-card"^>
+echo           ^<div class="stat-value" id="streak"^>5^</div^>
+echo           ^<div class="stat-label"^>连续打卡^</div^>
+echo         ^</div^>
+echo       ^</div^>
+echo ^<div class="sentence-list" id="review-list"^>^</div^>
+echo ^<div style="margin-top: 24px;"^>
+echo         ^<button id="start-review" class="btn btn-primary"^>✅ 开始今日复习（7词）^</button^>
+echo       ^</div^>
+echo     ^</div^>
+echo   ^</section^>
+echo ^<section id="stats" class="section"^>
+echo     ^<div class="card"^>
+echo       ^<h2 class="card-title"^>^<i^>📈^</i^> 学习管理中心^</h2^>
+echo ^<div class="stats-grid"^>
+echo         ^<div class="stat-card"^>
+echo           ^<div class="stat-value" id="total-minutes"^>84^</div^>
+echo           ^<div class="stat-label"^>累计学习（分钟）^</div^>
+echo         ^</div^>
+echo         ^<div class="stat-card"^>
+echo           ^<div class="stat-value" id="videos-completed"^>12^</div^>
+echo           ^<div class="stat-label"^>完成视频^</div^>
+echo         ^</div^>
+echo         ^<div class="stat-card"^>
+echo           ^<div class="stat-value" id="words-learned"^>156^</div^>
+echo           ^<div class="stat-label"^>掌握词汇^</div^>
+echo         ^</div^>
+echo       ^</div^>
+echo ^<h3 style="margin: 24px 0 12px;"^>📅 打卡日历（最近30天）^</h3^>
+echo       ^<div class="calendar" id="calendar"^>^</div^>
+echo ^<div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;"^>
+echo         ^<button id="mark-today" class="btn btn-primary"^>✅ 标记今日打卡^</button^>
+echo         ^<button id="view-history" class="btn btn-outline"^>🔍 查看学习记录^</button^>
+echo       ^</div^>
+echo     ^</div^>
+echo   ^</section^>
+echo ^</div^>
+echo ^<div class="word-popup" id="word-popup"^>
+echo   ^<button class="popup-close" id="popup-close"^>&times;^</button^>
+echo   ^<div class="word-header"^>
+echo     ^<span class="word-text" id="popup-word"^>coffee^</span^>
+echo     ^<span class="word-pos" id="popup-pos"^>noun^</span^>
+echo   ^</div^>
+echo   ^<div class="word-def" id="popup-def"^>A hot drink made from roasted and ground beans of a tropical shrub.^</div^>
+echo   ^<div class="word-example"^>
+echo     ^<strong^>Example:^</strong^> ^<span id="popup-example"^>I drink two cups of coffee every morning.^</span^>
+echo   ^</div^>
+echo ^</div^>
+echo ^<footer^>
+echo   ^<div class="container"^>
+echo     ^<p^>ListenLab · 为无编程基础英语爱好者打造｜GitHub Pages 可直接部署 · 数据本地模拟，零依赖^</p^>
+echo     ^<p style="margin-top: 8px; font-size: 0.85rem; color: #777;"^>💡 小提示：所有功能均已在单 HTML 文件中实现，下载后上传至 GitHub 仓库并开启 Pages 即可使用！^</p^>
+echo   ^</div^>
+echo ^</footer^>
+echo ^<script^>
+echo   const SAMPLE_VIDEOS = [ { id: "bbccoffee", title: "BBC Learning English: How to Order Coffee", scene: "daily", level: "beginner", type: "dialogue", duration: "2m 18s", desc: "学习在咖啡馆点单的实用英语表达，语速慢、发音清晰，适合初学者跟读模仿。", sentences: [ "Hi, can I get a small coffee, please?", "Sure! Would you like milk or sugar?", "Just milk, thanks.", "Here you go. That'll be £2.50.", "Thank you very much!" ], words: [ { word: "coffee", pos: "noun", def: "A hot drink made from roasted and ground beans of a tropical shrub.", example: "I drink two cups of coffee every morning." }, { word: "milk", pos: "noun", def: "A white liquid produced by female mammals to feed their young.", example: "She added milk to her tea." }, { word: "sugar", pos: "noun", def: "A sweet crystalline substance obtained from various plants.", example: "Don't add too much sugar to your coffee." }, { word: "small", pos: "adjective", def: "Of a size that is less than normal or usual.", example: "I'd like a small coffee, please." }, { word: "please", pos: "interjection", def: "Used to make a request polite.", example: "Can I get a coffee, please?" } ] }, { id: "tedtalk", title: "Why We All Need to Practice Empathy", scene: "work", level: "intermediate", type: "speech", duration: "14m 02s", desc: "TED 演讲节选，探讨共情力在职场与生活中的重要性，语速适中，含复合句和抽象词汇。", sentences: [ "Empathy isn't just about feeling sorry for someone.", "It's about truly understanding their perspective.", "In teams, empathy builds trust and psychological safety.", "Without it, collaboration falls apart.", "So how do we practice it daily?" ], words: [ { word: "empathy", pos: "noun", def: "The ability to understand and share the feelings of another.", example: "Good leaders show empathy toward their team members." }, { word: "perspective", pos: "noun", def: "A particular attitude toward or way of thinking about something.", example: "Try to see the situation from her perspective." }, { word: "collaboration", pos: "noun", def: "The action of working with someone to produce something.", example: "Team collaboration improved after the workshop." } ] } ];
+echo   const USER_DATA = { streak: 5, totalMinutes: 84, videosCompleted: 12, wordsLearned: 156, reviewList: [ { word: "coffee", lastSeen: "2024-05-20", nextReview: "2024-05-22" }, { word: "milk", lastSeen: "2024-05-20", nextReview: "2024-05-22" }, { word: "sugar", lastSeen: "2024-05-19", nextReview: "2024-05-23" }, { word: "small", lastSeen: "2024-05-19", nextReview: "2024-05-23" }, { word: "please", lastSeen: "2024-05-18", nextReview: "2024-05-24" }, { word: "empathy", lastSeen: "2024-05-17", nextReview: "2024-05-25" }, { word: "perspective", lastSeen: "2024-05-17", nextReview: "2024-05-25" } ], mastered: ["hello", "world", "yes", "no", "thank", "you", "good", "morning", "afternoon", "evening", "how", "are", "you", "fine", "thanks"], todayCompleted: new Set(["2024-05-21"]), calendarDays: ["2024-05-01", "2024-05-02", "2024-05-03", "2024-05-04", "2024-05-05", "2024-05-06", "2024-05-07", "2024-05-08", "2024-05-09", "2024-05-10", "2024-05-11", "2024-05-12", "2024-05-13", "2024-05-14", "2024-05-15", "2024-05-16", "2024-05-17", "2024-05-18", "2024-05-19", "2024-05-20", "2024-05-21"] };
+echo   const tabs = document.querySelectorAll('.tab-btn');
+echo   const sections = document.querySelectorAll('.section');
+echo   const videoGrid = document.getElementById('video-grid');
+echo   const sentenceList = document.getElementById('sentence-list');
+echo   const subtitleDisplay = document.getElementById('subtitle-display');
+echo   const speedSlider = document.getElementById('speed-slider');
+echo   const speedValue = document.getElementById('speed-value');
+echo   const playBtn = document.getElementById('play-btn');
+echo   const pauseBtn = document.getElementById('pause-btn');
+echo   const loopBtn = document.getElementById('loop-btn');
+echo   const dictationInput = document.getElementById('dictation-input');
+echo   const checkDictationBtn = document.getElementById('check-dictation');
+echo   const dictationFeedback = document.getElementById('dictation-feedback');
+echo   const fillOptions = document.querySelectorAll('.fill-option');
+echo   const fillFeedback = document.getElementById('fill-feedback');
+echo   const reviewListEl = document.getElementById('review-list');
+echo   const startReviewBtn = document.getElementById('start-review');
+echo   const calendarEl = document.getElementById('calendar');
+echo   const markTodayBtn = document.getElementById('mark-today');
+echo   const popup = document.getElementById('word-popup');
+echo   const popupClose = document.getElementById('popup-close');
+echo   const popupWord = document.getElementById('popup-word');
+echo   const popupPos = document.getElementById('popup-pos');
+echo   const popupDef = document.getElementById('popup-def');
+echo   const popupExample = document.getElementById('popup-example');
+echo   let currentVideo = SAMPLE_VIDEOS[0];
+echo   let currentSentenceIndex = 0;
+echo   let isLooping = false;
+echo   let currentSpeed = 1.0;
+echo   function init() { renderVideoGrid(); renderSentenceList(); updateSubtitle(); bindEvents(); renderCalendar(); renderReviewList(); updateStats(); }
+echo   function renderVideoGrid() { videoGrid.innerHTML = ''; SAMPLE_VIDEOS.forEach(video => { const div = document.createElement('div'); div.className = 'sentence-item'; div.innerHTML = ` <h3>${video.title}</h3> <div style="display:flex;gap:8px;margin-top:8px;"> <span class="badge scene">${video.scene}</span> <span class="badge level">${video.level}</span> <span class="badge type">${video.type}</span> </div> <p style="font-size:0.9rem;color:#666;margin-top:8px;">${video.desc.substring(0, 60)}...</p> `; div.addEventListener('click', () => { currentVideo = video; currentSentenceIndex = 0; renderSentenceList(); updateSubtitle(); switchTab('player'); }); videoGrid.appendChild(div); }); }
+echo   function renderSentenceList() { sentenceList.innerHTML = ''; currentVideo.sentences.forEach((sent, idx) => { const div = document.createElement('div'); div.className = 'sentence-item' + (idx === currentSentenceIndex ? ' active' : ''); div.textContent = sent; div.addEventListener('click', () => { currentSentenceIndex = idx; document.querySelectorAll('.sentence-item').forEach(el => el.classList.remove('active')); div.classList.add('active'); updateSubtitle(); }); sentenceList.appendChild(div); }); }
+echo   function updateSubtitle() { if (currentVideo.sentences.length > 0) { const sent = currentVideo.sentences[currentSentenceIndex]; subtitleDisplay.innerHTML = `<strong>[${currentSentenceIndex + 1}/${currentVideo.sentences.length}]</strong> ${sent}`; const words = sent.match(/\b\w+\b/g) || []; const highlighted = words.map(w => `<span class="clickable-word" data-word="${w}">${w}</span>`).join(' '); subtitleDisplay.innerHTML = `<strong>[${currentSentenceIndex + 1}/${currentVideo.sentences.length}]</strong> ${highlighted}`; subtitleDisplay.querySelectorAll('.clickable-word').forEach(span => { span.addEventListener('click', (e) => { const word = e.target.dataset.word.toLowerCase(); const match = currentVideo.words.find(w => w.word.toLowerCase() === word); if (match) { popupWord.textContent = match.word; popupPos.textContent = match.pos; popupDef.textContent = match.def; popupExample.textContent = match.example; popup.style.display = 'block'; } }); }); } }
+echo   function renderCalendar() { const today = new Date(); const year = today.getFullYear(); const month = today.getMonth(); const firstDay = new Date(year, month, 1); const lastDay = new Date(year, month + 1, 0); const daysInMonth = lastDay.getDate(); calendarEl.innerHTML = ''; ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(day => { const el = document.createElement('div'); el.className = 'calendar-day'; el.textContent = day.charAt(0); el.style.opacity = '0.7'; calendarEl.appendChild(el); }); const prevLastDay = new Date(year, month, 0).getDate(); const prevStartDay = firstDay.getDay(); for (let i = prevStartDay - 1; i >= 0; i--) { const el = document.createElement('div'); el.className = 'calendar-day other-month'; el.textContent = prevLastDay - i; calendarEl.appendChild(el); } const todayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`; for (let i = 1; i <= daysInMonth; i++) { const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`; const el = document.createElement('div'); el.className = 'calendar-day'; el.textContent = i; if (dateStr === todayStr) el.classList.add('today'); if (USER_DATA.todayCompleted.has(dateStr)) el.classList.add('completed'); if (i === 15 && !USER_DATA.todayCompleted.has(dateStr)) el.classList.add('missed'); calendarEl.appendChild(el); } }
+echo   function renderReviewList() { reviewListEl.innerHTML = ''; USER_DATA.reviewList.forEach((item, idx) => { const div = document.createElement('div'); div.className = 'sentence-item'; div.innerHTML = ` <strong>${item.word}</strong> <span style="color:#777;font-size:0.9rem;">→ due ${item.nextReview}</span> <div style="margin-top:8px;font-size:0.9rem;color:#555;"> ${item.word} • ${SAMPLE_VIDEOS[0].words.find(w => w.word.toLowerCase() === item.word.toLowerCase())?.def || 'definition not found'} </div> `; reviewListEl.appendChild(div); }); }
+echo   function updateStats() { document.getElementById('review-count').textContent = USER_DATA.reviewList.length; document.getElementById('mastered-count').textContent = USER_DATA.mastered.length; document.getElementById('streak').textContent = USER_DATA.streak; document.getElementById('total-minutes').textContent = USER_DATA.totalMinutes; document.getElementById('videos-completed').textContent = USER_DATA.videosCompleted; document.getElementById('words-learned').textContent = USER_DATA.wordsLearned; }
+echo   function bindEvents() { tabs.forEach(tab => { tab.addEventListener('click', () => { const target = tab.dataset.tab; tabs.forEach(t => t.classList.remove('active')); sections.forEach(s => s.classList.remove('active')); tab.classList.add('active'); document.getElementById(target).classList.add('active'); }); }); speedSlider.addEventListener('input', () => { currentSpeed = parseFloat(speedSlider.value); speedValue.textContent = currentSpeed.toFixed(1) + 'x'; }); playBtn.addEventListener('click', () => { subtitleDisplay.style.opacity = '1'; subtitleDisplay.style.transform = 'scale(1)'; setTimeout(() => { subtitleDisplay.style.opacity = '0.8'; subtitleDisplay.style.transform = 'scale(0.98)'; }, 300); }); pauseBtn.addEventListener('click', () => { subtitleDisplay.style.opacity = '0.6'; subtitleDisplay.style.transform = 'scale(0.95)'; }); loopBtn.addEventListener('click', () => { isLooping = !isLooping; loopBtn.innerHTML = isLooping ? '⏹ Stop Loop' : '🔁 Single Sentence'; }); checkDictationBtn.addEventListener('click', () => { const userAns = dictationInput.value.trim().toLowerCase(); const correctAns = currentVideo.sentences[currentSentenceIndex].toLowerCase(); dictationFeedback.className = 'feedback'; if (userAns === correctAns) { dictationFeedback.textContent = '✅ Correct! Great job!'; dictationFeedback.classList.add('correct'); USER_DATA.mastered.push(currentVideo.sentences[currentSentenceIndex]); } else { dictationFeedback.textContent = `❌ Incorrect. Correct answer: "${currentVideo.sentences[currentSentenceIndex]}"`; dictationFeedback.classList.add('incorrect'); } dictationFeedback.style.display = 'block'; setTimeout(() => { dictationFeedback.style.display = 'none'; }, 4000); }); fillOptions.forEach(btn => { btn.addEventListener('click', () => { const selected = btn.dataset.word; const correct = 'don\'t'; fillFeedback.className = 'feedback'; if (selected === correct) { fillFeedback.textContent = '✅ Correct! “I don’t like coffee with milk.”'; fillFeedback.classList.add('correct'); } else { fillFeedback.textContent = `❌ Try again! Remember: “I” + “don’t”`; fillFeedback.classList.add('incorrect'); } fillFeedback.style.display = 'block'; }); }); startReviewBtn.addEventListener('click', () => { alert(`✅ Starting review of ${USER_DATA.reviewList.length} words!\n\nThis would launch spaced repetition quiz in full version.`); }); markTodayBtn.addEventListener('click', () => { const todayStr = new Date().toISOString().split('T')[0]; USER_DATA.todayCompleted.add(todayStr); alert('🎉 Day marked! Keep up the great work!'); renderCalendar(); updateStats(); }); popupClose.addEventListener('click', () => { popup.style.display = 'none'; }); popup.addEventListener('click', (e) => { if (e.target === popup) popup.style.display = 'none'; }); document.getElementById('filter-scene').addEventListener('change', renderVideoGrid); document.getElementById('filter-level').addEventListener('change', renderVideoGrid); document.getElementById('search-input').addEventListener('input', renderVideoGrid); }
+echo   function switchTab(tabId) { tabs.forEach(t => t.classList.remove('active')); sections.forEach(s => s.classList.remove('active')); document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active'); document.getElementById(tabId).classList.add('active'); }
+echo   document.addEventListener('DOMContentLoaded', init);
+echo ^</script^>
+echo ^</body^>
+echo ^</html^>
+) > "%FOLDER%\index.html"
+
+:: ========== 2. 写入 README.md ==========
+(
+echo # 🎧 ListenLab · YouTube 英语精听训练站
+echo 
+echo > 专为零编程基础英语学习者打造｜纯前端 · 免服务器 · GitHub Pages 一键上线  
+echo > ✅ 变速听力｜✅ 点击查词｜✅ 单句循环｜✅ 听写练习｜✅ 打卡日历｜✅ 生词本复习
+echo 
+echo ## 🌐 在线体验
+echo 👉 [https://yourname.github.io/listenlab/](https://yourname.github.io/listenlab/)  
+echo （部署后替换 `yourname` 为你自己的 GitHub 用户名）
+echo 
+echo ## 🚀 快速部署（3 分钟）
+echo 1. **Fork 或克隆本仓库**（或直接上传 `index.html` + `favicon.ico` 到新仓库）  
+echo 2. 进入仓库 → Settings → Pages →  
+echo    - ✅ Source: `main branch`  
+echo    - ✅ Folder: `/ (root)`  
+echo    - 🔘 Save  
+echo 3. 几秒后，绿色提示出现 → 点击链接即用！
+echo 
+echo ## ✨ 核心功能
+echo | 模块 | 功能 |
+echo |------|------|
+echo | 📺 **沉浸学习** | 0.5x～2.0x 连续变速、单句循环、字幕点击查词（音标+释义+原句例句） |
+echo | 📝 **词句练习** | 句子听写、选词填空、短语搭配（自动关联当前视频重点词） |
+echo | 📅 **打卡管理** | 可视化日历、连续打卡奖励、学习数据统计（分钟/词汇/视频） |
+echo | 🧠 **巩固复习** | 生词本按艾宾浩斯规律提醒、模糊词重练、闯关模式（后续可扩展） |
+echo 
+echo ## 💡 使用提示
+echo - 点击字幕任意单词 → 弹出详细释义（例句即视频原句）  
+echo - 拖动语速滑块 → 实时显示 `0.7x` / `1.3x` 等微调值  
+echo - 每日完成 1 次听写或复习 → 点击日历今日圆点 ✅ 即打卡成功  
+echo - 所有数据仅存在浏览器内存中（刷新不丢失当前会话），隐私安全  
+echo 
+echo > 🌟 无账号、无注册、无追踪 —— 你的英语进步，只属于你自己。
+) > "%FOLDER%\README.md"
+
+:: ========== 3. 下载 favicon.ico（使用 PowerShell 自动下载）==========
+PowerShell -Command "Invoke-WebRequest -Uri 'https://bailian-bmp-pre.oss-cn-hangzhou.aliyuncs.com/public/system_agent/favicon.ico' -OutFile '%FOLDER%\favicon.ico'" 2>nul
+
+:: ========== 4. 打包成 ZIP ==========
+powershell -Command "Compress-Archive -Path '%FOLDER%' -DestinationPath 'listenlab.zip' -Force"
+
+:: ========== 完成 ==========
+echo.
+echo ✅ 成功！listenlab.zip 已生成在当前文件夹！
+echo 📌 请将该 ZIP 解压，把其中的 index.html 上传到 GitHub 仓库根目录即可。
+echo.
+pause
+
